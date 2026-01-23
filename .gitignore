@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Cache and temporary files
+cache/
+*.tmp
+*.log
+*.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+venv/
+env/
+ENV/
+
+# Test files
+test_*.py
+*_test.py
+
+# Compiled files
+*.pyc
+*.pyo
