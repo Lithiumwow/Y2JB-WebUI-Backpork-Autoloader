@@ -139,17 +139,6 @@ This project integrates and builds upon the work of several amazing developers a
 - **[ps5_elf_sdk_downgrade.py](https://gist.github.com/idlesauce/2ded24b7b5ff296f21792a8202542aaa)** by [@idlesauce](https://github.com/idlesauce) - PS5 ELF SDK version patching tool
 - **make_fself.py** - Fake signing tool for PS5 ELF files
 
-### Special Thanks
-
-- **idlesauce** - Original BackPork concept and code
-- **BestPig** - BackPork development and BPS patch creation
-- **Gezine** - Y2JB development
-- **Nazky** - Y2JB-WebUI development
-- **NookieAI** - PS5-Vault development and FTP implementation inspiration
-- **EchoStretch** - Testing and feedback
-- **kira** - Patch development assistance
-- **SlimGary** - Support and testing
-- **Hakim** - The love of **pork** 🐷😍
 
 ## License
 
