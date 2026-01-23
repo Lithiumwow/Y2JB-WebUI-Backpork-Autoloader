@@ -123,6 +123,39 @@ Project Root/
 - **Signing Errors**: Check that `make_fself.py` is accessible
 - **ELF Format Errors**: Files should auto-decrypt via FTP payload
 
+## Credits & Acknowledgments
+
+This project integrates and builds upon the work of several amazing developers and projects:
+
+### Core Projects
+
+- **[Y2JB](https://github.com/Gezine/Y2JB)** by [@Gezine](https://github.com/Gezine) - The foundation PS5 jailbreak project
+- **[Y2JB-WebUI](https://github.com/Nazky/Y2JB-WebUI)** by [@Nazky](https://github.com/Nazky) - The web interface this module integrates with
+- **[BackPork](https://github.com/BestPig/BackPork)** by [@BestPig](https://github.com/BestPig) - The PS5 backporting system and BPS patches
+- **[PS5-Vault](https://github.com/NookieAI/PS5-Vault)** by [@NookieAI](https://github.com/NookieAI) - PS5 game management tool (inspiration for FTP features)
+
+### Tools & Scripts
+
+- **[ps5_elf_sdk_downgrade.py](https://gist.github.com/idlesauce/2ded24b7b5ff296f21792a8202542aaa)** by [@idlesauce](https://github.com/idlesauce) - PS5 ELF SDK version patching tool
+- **make_fself.py** - Fake signing tool for PS5 ELF files
+
+### Special Thanks
+
+- **idlesauce** - Original BackPork concept and code
+- **BestPig** - BackPork development and BPS patch creation
+- **Gezine** - Y2JB development
+- **Nazky** - Y2JB-WebUI development
+- **NookieAI** - PS5-Vault development and FTP implementation inspiration
+- **EchoStretch** - Testing and feedback
+- **kira** - Patch development assistance
+- **SlimGary** - Support and testing
+- **Hakim** - The love of **pork** 🐷😍
+
 ## License
 
-Same as Y2JB-WebUI and BackPork projects.
+This project integrates with projects that use various licenses:
+- **BackPork**: GPL-3.0
+- **Y2JB-WebUI**: Check original repository
+- **Y2JB**: Check original repository
+
+Please respect the licenses of all integrated projects.
