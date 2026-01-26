@@ -123,6 +123,10 @@ Project Root/
 - **Signing Errors**: Check that `make_fself.py` is accessible
 - **ELF Format Errors**: Files should auto-decrypt via FTP payload
 
+## Related Projects
+
+- **[PS5-BACKPORK-KITCHEN](https://github.com/rajeshca911/PS5-BACKPORK-KITCHEN)** - A Windows GUI application with similar functionality. See [COMPARISON.md](COMPARISON.md) for a detailed feature comparison.
+
 ## Credits & Acknowledgments
 
 This project integrates and builds upon the work of several amazing developers and projects:
@@ -132,7 +136,8 @@ This project integrates and builds upon the work of several amazing developers a
 - **[Y2JB](https://github.com/Gezine/Y2JB)** by [@Gezine](https://github.com/Gezine) - The foundation PS5 jailbreak project ([Releases](https://github.com/Gezine/Y2JB/releases/tag/1.3))
 - **[Y2JB-WebUI](https://github.com/Nazky/Y2JB-WebUI)** by [@Nazky](https://github.com/Nazky) - The web interface this module integrates with
 - **[BackPork](https://github.com/BestPig/BackPork)** by [@BestPig](https://github.com/BestPig) - The PS5 backporting system and BPS patches
-- **[PS5-Vault](https://github.com/NookieAI/PS5-Vault)** by [@NookieAI](https://github.com/NookieAI) - PS5 game management tool (inspiration for FTP features) ([Releases](https://github.com/NookieAI/PS5-Vault/releases))
+- **[PS5-BACKPORK-KITCHEN](https://github.com/rajeshca911/PS5-BACKPORK-KITCHEN)** by [@rajeshca911](https://github.com/rajeshca911) - Windows GUI tool for PS5 backporting ([v1.2.0](https://github.com/rajeshca911/PS5-BACKPORK-KITCHEN/releases/tag/v1.2.0)) - Similar functionality with desktop GUI
+- **[PS5-Vault](https://github.com/NookieAI/PS5-Vault)** by [@NookieAI](https://github.com/NookieAI) - PS5 game management tool (inspiration for FTP features) ([Releases](https://github.com/NookieAI/PS5-Vault/releases)) ([Releases](https://github.com/NookieAI/PS5-Vault/releases))
 
 ### Tools & Scripts
 
