@@ -112,3 +112,13 @@ Both projects:
 **PS5-BACKPORK-KITCHEN Advantages**: More advanced features like batch processing, ELF inspection, and statistics for power users who prefer a desktop GUI.
 
 Both tools achieve the same end result: **automated PS5 game backporting with fakelib creation**.
+
+## Technical Deep Dive
+
+For a detailed technical comparison of the **patching and signing methods**, see [TECHNICAL_COMPARISON.md](TECHNICAL_COMPARISON.md).
+
+**Summary:**
+- ✅ **BPS Patching**: Identical algorithm (same BPS specification, same VLI encoding, same action types)
+- ✅ **Fake Signing**: 100% identical (same `make_fself.py` tool, same parameters)
+- ✅ **Firmware Processing**: Identical (same patch files, same directory structure)
+- 🎯 **Only Difference**: File transfer method (FTP automation vs manual copying)
