@@ -67,9 +67,10 @@ Y2JB-WebUI-Backpork-Autoloader/
 
 ## Dependencies
 
-- **BackPork patches**: BPS patch files for system libraries
+- **BackPork patches**: Automatically downloaded from [BackPork repository](https://github.com/BestPig/BackPork/tree/master/patches) and cached locally
 - **make_fself.py**: For fake signing ELF files
 - **Python packages**: Already included in Y2JB-WebUI requirements
+- **Internet connection**: Required for initial patch download (patches are cached for offline use)
 
 ## Directory Structure Requirements
 
@@ -83,14 +84,17 @@ Project Root/
 │   │   └── backpork.js
 │   ├── templates/
 │   │   └── backpork.html
+│   ├── cache/
+│   │   └── backpork/
+│   │       └── patches/          # Patches downloaded from GitHub (auto-created)
+│   │           ├── 6xx/
+│   │           └── 7xx/
 │   └── server.py
-├── BackPork/
-│   └── patches/
-│       ├── 6xx/
-│       └── 7xx/
 └── make_fself/
     └── make_fself.py
 ```
+
+**Note:** Patches are automatically downloaded from the [BackPork repository](https://github.com/BestPig/BackPork/tree/master/patches) on first use and cached locally. No manual patch installation required!
 
 ## Usage
 
@@ -113,13 +117,18 @@ Project Root/
 
 - Requires `ftpsrv-ps5.elf` payload to be running (port 2121)
 - Files are automatically decrypted during FTP transfer
+- **Patches are automatically downloaded from GitHub** - no manual installation needed
 - Cache folder: `Y2JB-WebUI/cache/backpork/`
+  - Patches are cached in: `cache/backpork/patches/{firmware}/`
 - Processed files are saved to: `{game_path}/fakelib/`
 
 ## Troubleshooting
 
 - **FTP Connection Errors**: Make sure ftpsrv-ps5.elf payload is running
-- **Patch Errors**: Verify patch files exist in `BackPork/patches/{firmware}/`
+- **Patch Download Errors**: 
+  - Check your internet connection (required for initial download)
+  - Verify the patch exists in the [BackPork repository](https://github.com/BestPig/BackPork/tree/master/patches)
+  - Check cached patches in `cache/backpork/patches/{firmware}/`
 - **Signing Errors**: Check that `make_fself.py` is accessible
 - **ELF Format Errors**: Files should auto-decrypt via FTP payload
 

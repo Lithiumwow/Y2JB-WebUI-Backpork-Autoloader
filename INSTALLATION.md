@@ -12,8 +12,9 @@ Copy these files to your Y2JB-WebUI installation:
 - `templates/backpork.html` → `Y2JB-WebUI/templates/backpork.html`
 
 **Dependencies:**
-- `BackPork/patches/` → `{project_root}/BackPork/patches/`
 - `make_fself/` → `{project_root}/make_fself/`
+
+**Note:** BackPork patches are automatically downloaded from GitHub on first use. No manual patch installation required!
 
 ### Step 2: Modify server.py
 
@@ -45,7 +46,7 @@ Add a link to the BackPork page in your main navigation (usually in `templates/i
 
 ### Step 4: Verify Structure
 
-Ensure your project structure looks like this:
+Ensure your project structure looks like this (patches will be auto-downloaded to cache):
 
 ```
 Project Root/
@@ -56,11 +57,12 @@ Project Root/
 │   │   └── backpork.js              ✓
 │   ├── templates/
 │   │   └── backpork.html            ✓
+│   ├── cache/
+│   │   └── backpork/
+│   │       └── patches/             ✓ (auto-created, patches downloaded from GitHub)
+│   │           ├── 6xx/
+│   │           └── 7xx/
 │   └── server.py                    ✓ (modified)
-├── BackPork/
-│   └── patches/
-│       ├── 6xx/                     ✓
-│       └── 7xx/                     ✓
 └── make_fself/
     └── make_fself.py                 ✓
 ```
@@ -82,8 +84,8 @@ Project Root/
 - `server.py` (added routes and imports)
 
 ### Dependencies Required:
-- `BackPork/patches/` folder with BPS files
 - `make_fself/make_fself.py` for signing
+- **BackPork patches**: Automatically downloaded from GitHub on first use (no manual installation needed)
 
 ## Verification Checklist
 
@@ -92,7 +94,7 @@ Project Root/
 - [ ] `backpork.html` copied to `Y2JB-WebUI/templates/`
 - [ ] Routes added to `server.py`
 - [ ] Imports added to `server.py`
-- [ ] `BackPork/patches/` folder exists with 6xx and 7xx subfolders
 - [ ] `make_fself/make_fself.py` exists
+- [ ] Internet connection available (for patch download on first use)
 - [ ] Server starts without errors
 - [ ] `/backpork` page loads in browser

@@ -6,6 +6,8 @@ import subprocess
 import sys
 import base64
 import logging
+import urllib.request
+import urllib.error
 from pathlib import Path
 
 # Set up logging
@@ -21,7 +23,8 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))  # Y2JB-WebUI/src/
 WEBUI_DIR = os.path.dirname(SCRIPT_DIR)  # Y2JB-WebUI/
 PROJECT_ROOT = os.path.dirname(WEBUI_DIR)  # workspace root/
 CACHE_DIR = os.path.join(WEBUI_DIR, "cache", "backpork")  # Absolute path to cache folder
-PATCHES_DIR = os.path.join(PROJECT_ROOT, "BackPork", "patches")
+PATCHES_CACHE_DIR = os.path.join(CACHE_DIR, "patches")  # Cache for downloaded patches
+BACKPORK_PATCHES_URL = "https://raw.githubusercontent.com/BestPig/BackPork/master/patches"
 MAKE_FSELF_PATH = os.path.join(PROJECT_ROOT, "make_fself", "make_fself.py")
 
 # Required libraries to fetch and patch
@@ -37,6 +40,80 @@ REQUIRED_LIBS = {
 def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def download_patch_from_github(firmware, patch_name):
+    """
+    Download a BPS patch file from the BackPork GitHub repository.
+    Patches are cached locally to avoid repeated downloads.
+    
+    Args:
+        firmware: Firmware version (e.g., '6xx', '7xx')
+        patch_name: Name of the patch file (e.g., 'libSceAgc.bps')
+    
+    Returns:
+        dict with 'success' (bool) and either 'path' (str) or 'error' (str)
+    """
+    try:
+        ensure_dir(PATCHES_CACHE_DIR)
+        ensure_dir(os.path.join(PATCHES_CACHE_DIR, firmware))
+        
+        # Local cache path
+        patch_path = os.path.join(PATCHES_CACHE_DIR, firmware, patch_name)
+        
+        # If patch already exists in cache, use it
+        if os.path.exists(patch_path):
+            print(f"[PATCH] Using cached patch: {patch_path}")
+            return {"success": True, "path": patch_path, "cached": True}
+        
+        # Download from GitHub
+        patch_url = f"{BACKPORK_PATCHES_URL}/{firmware}/{patch_name}"
+        print(f"[PATCH] Downloading patch from GitHub: {patch_url}")
+        
+        try:
+            with urllib.request.urlopen(patch_url, timeout=30) as response:
+                if response.status == 200:
+                    patch_data = response.read()
+                    
+                    # Verify it's a valid BPS patch (starts with 'BPS1')
+                    if not patch_data.startswith(b'BPS1'):
+                        return {
+                            "success": False,
+                            "error": f"Downloaded file is not a valid BPS patch (missing BPS1 header)"
+                        }
+                    
+                    # Save to cache
+                    with open(patch_path, 'wb') as f:
+                        f.write(patch_data)
+                    
+                    file_size = len(patch_data)
+                    print(f"[PATCH] OK Downloaded and cached patch: {patch_path} ({file_size} bytes)")
+                    return {"success": True, "path": patch_path, "cached": False}
+                else:
+                    return {
+                        "success": False,
+                        "error": f"HTTP {response.status}: Failed to download patch from GitHub"
+                    }
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return {
+                    "success": False,
+                    "error": f"Patch not found on GitHub: {patch_url}. The patch may not exist for firmware {firmware}."
+                }
+            return {
+                "success": False,
+                "error": f"HTTP {e.code}: Failed to download patch from GitHub: {str(e)}"
+            }
+        except urllib.error.URLError as e:
+            return {
+                "success": False,
+                "error": f"Network error downloading patch: {str(e)}. Check your internet connection."
+            }
+    except Exception as e:
+        import traceback
+        return {
+            "success": False,
+            "error": f"Error downloading patch: {str(e)}\n{traceback.format_exc()}"
+        }
 
 def get_ftp_connection(ip, port):
     """Connect to PS5 FTP server with better error messages"""
@@ -1042,25 +1119,27 @@ def process_library_for_game(ip, port, lib_name, firmware, game_path):
         steps[-1]["success"] = True
         print(f"[{lib_name}] OK Converted to ELF: {lib_path}")
     
-    # Step 2: Find corresponding patch file
-    print(f"[{lib_name}] Step 2: Finding patch file...")
-    steps.append({"name": "Finding patch file", "success": False})
+    # Step 2: Download patch file from GitHub
+    print(f"[{lib_name}] Step 2: Downloading patch file from BackPork repository...")
+    steps.append({"name": "Downloading patch file", "success": False})
     patch_name = REQUIRED_LIBS.get(lib_name)
     if not patch_name:
         # Fallback: try to construct patch name
         patch_name = lib_name.replace('.sprx', '.bps').replace('.native.sprx', '.native.bps')
     
-    patch_path = os.path.join(PATCHES_DIR, firmware, patch_name)
-    
-    if not os.path.exists(patch_path):
-        steps[-1]["error"] = f"Patch file not found: {patch_path}"
+    # Download patch from GitHub (will use cache if available)
+    download_result = download_patch_from_github(firmware, patch_name)
+    if not download_result.get('success'):
+        steps[-1]["error"] = download_result.get('error', 'Unknown error')
         return {
             "success": False, 
-            "error": f"Patch file not found: {patch_path}. Make sure patches are in BackPork/patches/{firmware}/",
+            "error": f"Failed to download patch {patch_name}: {download_result.get('error')}",
             "steps": steps
         }
+    patch_path = download_result['path']
     steps[-1]["success"] = True
-    print(f"[{lib_name}] Step 2: OK Patch file found: {patch_path}")
+    cache_status = "cached" if download_result.get('cached') else "downloaded"
+    print(f"[{lib_name}] Step 2: OK Patch file {cache_status}: {patch_path}")
     
     # Step 3: Apply BPS patch
     print(f"[{lib_name}] Step 3: Applying BPS patch...")
