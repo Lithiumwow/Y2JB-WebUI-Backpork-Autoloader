@@ -125,7 +125,7 @@ Project Root/
 
 ## Related Projects
 
-- **[PS5-BACKPORK-KITCHEN](https://github.com/rajeshca911/PS5-BACKPORK-KITCHEN)** - A Windows GUI application with similar functionality. See [COMPARISON.md](COMPARISON.md) for a detailed feature comparison.
+- **[PS5-BACKPORK-KITCHEN](https://github.com/rajeshca911/PS5-BACKPORK-KITCHEN)** - A Windows GUI application with similar functionality
 
 ## Credits & Acknowledgments
 
