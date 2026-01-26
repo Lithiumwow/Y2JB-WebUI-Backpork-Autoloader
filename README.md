@@ -129,10 +129,10 @@ This project integrates and builds upon the work of several amazing developers a
 
 ### Core Projects
 
-- **[Y2JB](https://github.com/Gezine/Y2JB)** by [@Gezine](https://github.com/Gezine) - The foundation PS5 jailbreak project
+- **[Y2JB](https://github.com/Gezine/Y2JB)** by [@Gezine](https://github.com/Gezine) - The foundation PS5 jailbreak project ([Releases](https://github.com/Gezine/Y2JB/releases/tag/1.3))
 - **[Y2JB-WebUI](https://github.com/Nazky/Y2JB-WebUI)** by [@Nazky](https://github.com/Nazky) - The web interface this module integrates with
 - **[BackPork](https://github.com/BestPig/BackPork)** by [@BestPig](https://github.com/BestPig) - The PS5 backporting system and BPS patches
-- **[PS5-Vault](https://github.com/NookieAI/PS5-Vault)** by [@NookieAI](https://github.com/NookieAI) - PS5 game management tool (inspiration for FTP features)
+- **[PS5-Vault](https://github.com/NookieAI/PS5-Vault)** by [@NookieAI](https://github.com/NookieAI) - PS5 game management tool (inspiration for FTP features) ([Releases](https://github.com/NookieAI/PS5-Vault/releases))
 
 ### Tools & Scripts
 
