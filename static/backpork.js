@@ -11,7 +11,7 @@ const REQUIRED_LIBS = [
 
 async function refreshGames() {
     const gamesList = document.getElementById('games-list');
-    gamesList.innerHTML = '<div class="text-center py-4"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="mt-2 text-sm">Scanning for games...</p></div>';
+    gamesList.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-white/50"><i class="fa-solid fa-spinner fa-spin text-3xl mb-3"></i><p class="text-sm">Scanning for games…</p></div>';
     
     try {
         // Check if IP is set (by checking the settings)
@@ -28,10 +28,10 @@ async function refreshGames() {
         }
         if (!config.ip) {
             gamesList.innerHTML = `
-                <div class="text-center py-8 opacity-50">
-                    <i class="fa-solid fa-exclamation-circle text-4xl mb-2"></i>
-                    <p class="mb-2">PS5 IP Address not set</p>
-                    <p class="text-xs opacity-70">Please go to Settings and set your PS5 IP address first</p>
+                <div class="flex flex-col items-center justify-center py-16 text-white/50">
+                    <i class="fa-solid fa-exclamation-circle text-4xl mb-3"></i>
+                    <p class="text-sm font-medium mb-1">PS5 IP not set</p>
+                    <p class="text-xs text-white/50">Set your PS5 IP in Settings first</p>
                 </div>
             `;
             showToast('Please set PS5 IP address in Settings first', 'warning');
@@ -83,63 +83,60 @@ async function refreshGames() {
             gamesList.innerHTML = '';
             data.games.forEach(game => {
                 const gameCard = document.createElement('div');
-                gameCard.className = 'surface border rounded-lg p-4 hover:border-brand-blue/30 transition-all cursor-pointer hover:shadow-lg';
+                gameCard.className = 'ps5-card p-3 cursor-pointer group';
                 gameCard.onclick = () => selectGame(game);
                 
-                // Create cover image or placeholder - make it larger
                 const coverContainerId = `cover-${game.title_id.replace(/[^a-zA-Z0-9]/g, '-')}`;
                 let coverHtml = '';
                 if (game.cover_url) {
                     coverHtml = `
-                        <div id="${coverContainerId}" class="relative w-20 h-20 flex-shrink-0">
+                        <div id="${coverContainerId}" class="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-white/5">
                             <img src="${game.cover_url}" alt="${escapeHtml(game.title)}" 
-                                 class="w-20 h-20 object-cover rounded-lg border-2 border-white/20 shadow-md" 
+                                 class="w-full h-full object-cover" 
                                  onerror="this.style.display='none'; document.getElementById('${coverContainerId}-placeholder').style.display='flex';"
                                  loading="lazy">
-                            <div id="${coverContainerId}-placeholder" class="w-20 h-20 bg-gradient-to-br from-brand-blue/30 to-brand-light/30 rounded-lg border-2 border-white/20 flex items-center justify-center hidden shadow-md">
-                                <i class="fa-solid fa-gamepad text-3xl opacity-50"></i>
+                            <div id="${coverContainerId}-placeholder" class="absolute inset-0 bg-ps5-blue/20 flex items-center justify-center hidden">
+                                <i class="fa-solid fa-gamepad text-xl text-white/50"></i>
                             </div>
                         </div>
                     `;
                 } else {
                     coverHtml = `
-                        <div class="w-20 h-20 bg-gradient-to-br from-brand-blue/30 to-brand-light/30 rounded-lg border-2 border-white/20 flex items-center justify-center flex-shrink-0 shadow-md">
-                            <i class="fa-solid fa-gamepad text-3xl opacity-50"></i>
+                        <div class="w-14 h-14 rounded-lg bg-ps5-blue/20 flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-gamepad text-xl text-white/50"></i>
                         </div>
                     `;
                 }
                 
-                // Ensure title is visible - use title_id as fallback
                 const displayTitle = game.title && game.title !== game.title_id ? game.title : game.title_id;
                 
                 gameCard.innerHTML = `
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
                         ${coverHtml}
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-base mb-1 truncate" title="${escapeHtml(displayTitle)}">${escapeHtml(displayTitle)}</h4>
-                            <p class="text-xs opacity-60 font-mono truncate" title="${escapeHtml(game.title_id)}">${escapeHtml(game.title_id)}</p>
+                            <h4 class="font-semibold text-sm truncate text-white/95 group-hover:text-white" title="${escapeHtml(displayTitle)}">${escapeHtml(displayTitle)}</h4>
+                            <p class="text-xs text-white/45 font-mono truncate" title="${escapeHtml(game.title_id)}">${escapeHtml(game.title_id)}</p>
                         </div>
-                        <i class="fa-solid fa-chevron-right opacity-40 flex-shrink-0 text-xl"></i>
+                        <i class="fa-solid fa-chevron-right text-white/30 group-hover:text-ps5-blue transition-colors flex-shrink-0"></i>
                     </div>
                 `;
                 gamesList.appendChild(gameCard);
             });
         } else {
             const errorMsg = data.error || 'No games found';
-            // Replace newlines with <br> for better display
             const formattedError = escapeHtml(errorMsg).replace(/\n/g, '<br>');
             gamesList.innerHTML = `
-                <div class="text-center py-8 opacity-50">
-                    <i class="fa-solid fa-exclamation-triangle text-4xl mb-2"></i>
-                    <p>${formattedError}</p>
+                <div class="flex flex-col items-center justify-center py-16 text-white/50">
+                    <i class="fa-solid fa-exclamation-triangle text-4xl mb-3"></i>
+                    <p class="text-sm">${formattedError}</p>
                 </div>
             `;
         }
     } catch (error) {
         gamesList.innerHTML = `
-            <div class="text-center py-8 opacity-50">
-                <i class="fa-solid fa-exclamation-circle text-4xl mb-2"></i>
-                <p>Error: ${error.message}</p>
+            <div class="flex flex-col items-center justify-center py-16 text-white/50">
+                <i class="fa-solid fa-exclamation-circle text-4xl mb-3"></i>
+                <p class="text-sm">${escapeHtml(error.message)}</p>
             </div>
         `;
     }
@@ -160,15 +157,15 @@ function selectGame(game) {
     libsList.innerHTML = '';
     REQUIRED_LIBS.forEach((lib, index) => {
         const libItem = document.createElement('div');
-        libItem.className = 'flex items-center gap-3 p-3 bg-gray-200 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-700 hover:border-brand-blue/50 transition-colors';
+        libItem.className = 'flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-colors';
         libItem.innerHTML = `
             <input type="checkbox" 
                    id="lib-checkbox-${index}" 
-                   class="lib-checkbox w-4 h-4 text-brand-blue bg-gray-100 border-gray-300 rounded focus:ring-brand-blue focus:ring-2" 
+                   class="lib-checkbox w-4 h-4 rounded border-white/20 bg-white/5 text-ps5-blue focus:ring-ps5-blue focus:ring-2 focus:ring-offset-0 focus:ring-offset-transparent" 
                    data-lib-name="${escapeHtml(lib.name)}"
                    checked>
-            <label for="lib-checkbox-${index}" class="flex-1 cursor-pointer">
-                <span class="text-sm font-mono">${escapeHtml(lib.display)}</span>
+            <label for="lib-checkbox-${index}" class="flex-1 cursor-pointer text-sm font-mono text-white/80">
+                ${escapeHtml(lib.display)}
             </label>
         `;
         libsList.appendChild(libItem);
@@ -274,9 +271,9 @@ async function processLibraries() {
     const statusDiv = document.getElementById('processing-status');
     
     btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Processing ${selectedLibs.length} library(ies)...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing ${selectedLibs.length}…`;
     statusDiv.classList.remove('hidden');
-    statusDiv.innerHTML = `<div class="text-sm opacity-70"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Starting library processing (${selectedLibs.length} selected)...</div>`;
+    statusDiv.innerHTML = `<div class="text-sm text-white/60 flex items-center gap-2"><i class="fa-solid fa-spinner fa-spin"></i> Starting (${selectedLibs.length} selected)…</div>`;
     
     try {
         const response = await fetch('/api/backpork/process_libraries', {
@@ -330,27 +327,26 @@ async function processLibraries() {
             statusDiv.innerHTML = '';
             data.results.forEach(result => {
                 const statusItem = document.createElement('div');
-                statusItem.className = `p-3 rounded-lg mb-2 ${result.success ? 'bg-green-500/20 border border-green-500/30' : 'bg-red-500/20 border border-red-500/30'}`;
+                statusItem.className = `p-3 rounded-xl ${result.success ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-red-500/10 border border-red-500/20'}`;
                 
-                // Format the message with line breaks
                 const formattedMessage = escapeHtml(result.message || result.error || 'Unknown error').replace(/\n/g, '<br>');
                 
                 statusItem.innerHTML = `
                     <div class="flex items-start gap-3">
-                        <i class="fa-solid ${result.success ? 'fa-check-circle text-green-400' : 'fa-times-circle text-red-400'} text-lg mt-0.5"></i>
+                        <i class="fa-solid ${result.success ? 'fa-circle-check text-emerald-400' : 'fa-circle-xmark text-red-400'} text-base mt-0.5 flex-shrink-0"></i>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="text-sm font-bold font-mono">${escapeHtml(result.library)}</span>
-                                ${result.steps ? `<span class="text-xs opacity-60">(${result.steps.length} steps)</span>` : ''}
+                                <span class="text-sm font-semibold font-mono text-white/90">${escapeHtml(result.library)}</span>
+                                ${result.steps ? `<span class="text-xs text-white/40">${result.steps.length} steps</span>` : ''}
                             </div>
-                            <div class="text-xs opacity-80">${formattedMessage}</div>
+                            <div class="text-xs text-white/70">${formattedMessage}</div>
                             ${result.steps && result.steps.length > 0 ? `
                                 <div class="mt-2 space-y-1">
                                     ${result.steps.map(step => `
-                                        <div class="text-xs opacity-60 flex items-center gap-2">
-                                            <i class="fa-solid ${step.success ? 'fa-check text-green-400' : 'fa-times text-red-400'} text-xs"></i>
+                                        <div class="text-xs text-white/50 flex items-center gap-2">
+                                            <i class="fa-solid ${step.success ? 'fa-check text-emerald-400' : 'fa-times text-red-400'} text-xs"></i>
                                             <span>${escapeHtml(step.name)}</span>
-                                            ${step.error ? `<span class="text-red-400 ml-2">- ${escapeHtml(step.error)}</span>` : ''}
+                                            ${step.error ? `<span class="text-red-400">${escapeHtml(step.error)}</span>` : ''}
                                         </div>
                                     `).join('')}
                                 </div>
