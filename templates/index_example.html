@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');})();
+    </script>
+    <link rel="manifest" href="{{ url_for('static', filename='json/manifest.json') }}">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/icon.png') }}">
+    <title>Y2JB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Noto Sans', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'] },
+                    colors: {
+                        ps5: { black: '#0a0a0f', surface: '#14141a', card: '#1a1a22', blue: '#006FCD', blueLight: '#2180e0' },
+                        brand: { blue: '#006FCD', light: '#2180e0' },
+                        void: { 900: '#050507', 800: '#0a0e17', 700: '#151926', card: 'rgba(20, 24, 39, 0.7)' },
+                        neon: { purple: '#8b5cf6', blue: '#3b82f6', pink: '#ec4899', green: '#10b981', red: '#ef4444', yellow: '#f59e0b', orange: '#f97316' }
+                    },
+                    animation: { 'slideIn': 'slideIn 0.3s ease-out forwards', 'slideUp': 'slideUp 0.3s ease-out forwards', 'fadeIn': 'fadeIn 0.5s ease-out forwards' },
+                    keyframes: { slideIn: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } }, slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }, fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/compact.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/light-mode.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/toast.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/effects.css') }}">
+    <script src="{{ url_for('static', filename='color_mode.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='direct.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='toast.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='ui_features.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='drag_sort.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='index.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='clock.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='effects.js') }}" defer></script>
+    <style>
+        .ps5-bg { background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0,111,205,0.08), transparent 50%), #0a0a0f; }
+        .ps5-card { background: #1a1a22; border: 1px solid rgba(255,255,255,0.06); border-radius: 1rem; transition: border-color 0.2s, box-shadow 0.2s; }
+        .ps5-card:hover { border-color: rgba(0,111,205,0.35); box-shadow: 0 0 0 1px rgba(0,111,205,0.2); }
+        .ps5-btn-primary { background: #006FCD; color: white; border-radius: 0.75rem; font-weight: 600; transition: background 0.2s, transform 0.15s; box-shadow: 0 4px 14px -2px rgba(0,111,205,0.35); }
+        .ps5-btn-primary:hover:not(:disabled) { background: #2180e0; transform: translateY(-1px); }
+        .ps5-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); border-radius: 0.5rem; transition: all 0.2s; }
+        .ps5-btn-ghost:hover { border-color: rgba(0,111,205,0.5); color: #2180e0; }
+        .ps5-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+        .ps5-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .ps5-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .ajb-toggle { display: inline-flex; align-items: center; width: 2.75rem; height: 1.5rem; flex-shrink: 0; }
+        .ajb-toggle-track { position: absolute; inset: 0; border-radius: 9999px; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.12); transition: background 0.2s, border-color 0.2s; }
+        .ajb-toggle-thumb { position: absolute; left: 2px; top: 2px; width: 1.25rem; height: 1.25rem; border-radius: 9999px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: transform 0.2s; pointer-events: none; }
+        .ajb-toggle #AJB-B:checked ~ .ajb-toggle-track { background: #006FCD; border-color: #006FCD; }
+        .ajb-toggle #AJB-B:checked ~ .ajb-toggle-thumb { transform: translateX(1.25rem); }
+        html:not(.dark) .ajb-toggle-track { border-color: #d1d5db; background: #e5e7eb; }
+        html:not(.dark) .ajb-toggle-thumb { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        html:not(.dark) .ajb-toggle #AJB-B:checked ~ .ajb-toggle-track { background: #006FCD; border-color: #006FCD; }
+        html.dark body.ps5-body { color: #e5e5e5; }
+        html.dark .ps5-card { background: #1a1a22; border-color: rgba(255,255,255,0.06); }
+        html.dark .input-field { background: #14141a; border-color: rgba(255,255,255,0.1); color: white; }
+        html:not(.dark) .ps5-bg { background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0,111,205,0.06), transparent 50%), #f3f4f6; }
+        html:not(.dark) body.ps5-body { color: #111827; }
+        html:not(.dark) .ps5-card { background: #ffffff; border-color: rgba(0,0,0,0.08); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        html:not(.dark) .ps5-card:hover { border-color: rgba(0,111,205,0.4); box-shadow: 0 0 0 1px rgba(0,111,205,0.15); }
+        html:not(.dark) .input-field { background: #f9fafb; border-color: #d1d5db; color: #111827; }
+        html:not(.dark) .ps5-btn-ghost { border-color: #e5e7eb; color: #374151; }
+        html:not(.dark) .ps5-btn-ghost:hover { border-color: #006FCD; color: #006FCD; }
+        html:not(.dark) nav { background: rgba(255,255,255,0.95); border-bottom-color: rgba(0,0,0,0.08); }
+        html:not(.dark) nav a, html:not(.dark) nav button { color: #374151; }
+        html:not(.dark) nav a:hover, html:not(.dark) nav button:hover { color: #111827; }
+        html:not(.dark) nav a[href="{{ url_for('home') }}"] { color: #111827; }
+        html:not(.dark) #mobile-menu { border-top-color: rgba(0,0,0,0.08); }
+        html:not(.dark) nav .text-white\/60 { color: #6b7280 !important; }
+        html:not(.dark) nav button:hover .text-white\/60 { color: #111827 !important; }
+        html:not(.dark) .text-white\/40 { color: rgba(17,24,39,0.5) !important; }
+        html:not(.dark) .text-white\/50 { color: rgba(17,24,39,0.6) !important; }
+        html:not(.dark) .text-white\/60 { color: rgba(17,24,39,0.7) !important; }
+        html:not(.dark) .text-white\/70 { color: rgba(17,24,39,0.8) !important; }
+        html:not(.dark) .text-white\/80 { color: rgba(17,24,39,0.9) !important; }
+        html:not(.dark) .text-white\/90 { color: #111827 !important; }
+        .voidshell-embed .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        html.dark .voidshell-embed .glass { background: rgba(20, 24, 39, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .voidshell-embed .glass { background: rgba(255, 255, 255, 0.75); border: 1px solid rgba(0, 0, 0, 0.05); }
+    </style>
+</head>
+
+<body class="font-sans antialiased min-h-screen flex flex-col transition-colors duration-300 ps5-bg ps5-body text-white">
+    <script>
+        window.VOIDSHELL_PS5_HOST = '{{ ps5_ip|e }}';
+        window.VOIDSHELL_PS5_PORT = {{ voidshell_port|default(7007) }};
+        window.VOIDSHELL_EMBEDDED = true;
+        window.VOIDSHELL_ROOT_ID = 'voidshell-root';
+        window.VOIDSHELL_USE_PROXY = true;
+    </script>
+
+<nav class="relative w-full border-b border-white/5">
+    <div class="mx-auto px-4 sm:px-4 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+            <a href="/" class="flex items-center gap-2">
+                <i class="fa-brands fa-playstation text-3xl"></i>
+                <span class="font-bold text-xl tracking-tight">Y2JB</span>
+            </a>
+            <div class="absolute inset-y-0 right-0 flex items-center gap-2 lg:hidden">
+                <button onclick="toggleTheme()"
+                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <button type="button" onclick="toggleMenu()"
+                        class="relative inline-flex rounded-md w-10 h-10 rounded-full flex items-center justify-center surface border transition-all hover:scale-105 active:scale-95 hover:border-brand-blue/30">
+                    <i class="fa-solid fa-bars" id="mobile-menu-icon"></i>
+                </button>
+            </div>
+            <div class="items-center gap-2 hidden lg:flex">
+                <a href="{{ url_for('repo_manager_ui') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Repos</span>
+                </a>
+                <a href="{{ url_for('settings_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{{ url_for('system_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-server"></i>
+                    <span>System</span>
+                </a>
+                <a href="{{ url_for('logs_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>Logs</span>
+                </a>
+                <a href="{{ url_for('credits_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-heart"></i>
+                    <span>Credits</span>
+                </a>
+                <a href="{{ url_for('ftp_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-folder-tree"></i>
+                    <span>FTP - Experimental</span>
+                </a>
+                <a href="{{ url_for('dns_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>DNS</span>
+                </a>
+                <a href="{{ url_for('backpork_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-piggy-bank"></i>
+                    <span>Auto-Backpork</span>
+                </a>
+                <a href="{{ url_for('account_activator_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-user-check"></i>
+                    <span>Activator</span>
+                </a>
+                <a href="{{ url_for('voidshell_page') }}"
+                   class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                    <i class="fa-solid fa-ghost"></i>
+                    <span>VoidShell</span>
+                </a>
+                <button onclick="toggleTheme()"
+                        class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobile-menu" class="hidden" data-hidden="true">
+        <div class="space-y-1 px-2 pt-2 pb-3">
+            <a href="{{ url_for('repo_manager_ui') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-gear"></i>
+                <span>Repos</span>
+            </a>
+            <a href="{{ url_for('settings_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Settings</span>
+            </a>
+            <a href="{{ url_for('system_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-server"></i>
+                <span>System</span>
+            </a>
+            <a href="{{ url_for('logs_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-terminal"></i>
+                <span>Logs</span>
+            </a>
+            <a href="{{ url_for('credits_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-heart"></i>
+                <span>Credits</span>
+            </a>
+            <a href="{{ url_for('ftp_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-folder-tree"></i>
+                <span>FTP - Experimental</span>
+            </a>
+            <a href="{{ url_for('dns_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-globe"></i>
+                <span>DNS</span>
+            </a>
+            <a href="{{ url_for('backpork_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-piggy-bank"></i>
+                <span>Auto-Backpork</span>
+            </a>
+            <a href="{{ url_for('account_activator_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-user-check"></i>
+                <span>Activator</span>
+            </a>
+            <a href="{{ url_for('voidshell_page') }}"
+               class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-ghost"></i>
+                <span>VoidShell</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="ps5-card p-4">
+            <p class="text-xs font-medium text-white/40 uppercase tracking-wider mb-4">Connection</p>
+            <div class="space-y-4">
+                <div class="flex gap-2">
+                    <input type="text" name="IP" id="IP" placeholder="PS5 IP Address"
+                           class="input-field flex-1 px-4 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-ps5-blue focus:border-ps5-blue/50 outline-none transition-all font-mono bg-white/5 border-white/10">
+                    <button type="button" onclick="testLoaderPort()" class="ps5-btn-ghost px-3 py-2.5 rounded-xl text-xs whitespace-nowrap" title="Test if loader port is reachable">
+                        <i class="fa-solid fa-plug"></i> Test
+                    </button>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-sm text-white/80">Auto-Jailbreak</span>
+                    <label class="ajb-toggle relative inline-flex items-center cursor-pointer shrink-0" aria-label="Auto-Jailbreak">
+                        <input type="checkbox" id="AJB-B" class="sr-only peer" onclick="saveAJB()">
+                        <span class="ajb-toggle-track"></span>
+                        <span class="ajb-toggle-thumb"></span>
+                    </label>
+                </div>
+                <button id="SJB" type="button" class="touch-manipulation w-full min-h-[48px] ps5-btn-primary text-sm font-semibold flex items-center justify-center gap-2 rounded-xl uppercase relative overflow-hidden group">
+                    <i class="fa-brands fa-playstation absolute right-2 bottom-2 text-2xl text-white/10 group-hover:scale-110 transition-transform duration-300"></i>
+                    <i class="fa-solid fa-bolt text-lg text-yellow-300/90 relative z-10"></i>
+                    <span class="relative z-10">Jailbreak</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="ps5-card p-4">
+            <p class="text-xs font-medium text-white/40 uppercase tracking-wider mb-4">Tools</p>
+            <div class="space-y-2">
+                <button id="btn-update-dl0" onclick="installDownload0()" class="w-full px-4 py-2.5 ps5-btn-ghost text-sm flex items-center justify-between text-left">
+                    <span class="flex flex-col items-start">
+                        <span>Send Download0.dat</span>
+                        <span class="text-[10px] text-white/50">Requires download0.dat in Repos</span>
+                    </span>
+                    <i class="fa-solid fa-file-import text-white/40"></i>
+                </button>
+                <button id="btn-block-upd" onclick="blockUpdates()" class="w-full px-4 py-2.5 ps5-btn-ghost text-sm flex items-center justify-between">
+                    <span>Block Updates</span>
+                    <i class="fa-solid fa-shield-halved text-white/40"></i>
+                </button>
+                <input type="text" id="FTP_PORT" placeholder="FTP Port (default 1337)"
+                       class="input-field block w-full px-4 py-2 border rounded-xl text-xs font-mono bg-white/5 border-white/10 focus:ring-2 focus:ring-ps5-blue outline-none mt-2"
+                       onchange="saveFTPPort()">
+            </div>
+        </div>
+
+    </section>
+
+    <section class="ps5-card p-4 w-full mt-6">
+        <div class="flex flex-col gap-3 mb-4">
+            <h3 class="text-sm font-semibold text-white/90 flex items-center gap-2">
+                Payloads
+                <span id="payload-count" class="text-xs font-mono text-ps5-blue bg-ps5-blue/20 px-2 py-0.5 rounded-md">0</span>
+            </h3>
+            <div class="flex flex-col sm:flex-row gap-2 flex-wrap">
+                <input type="text" id="directUrlInput" placeholder="URL (.bin / .elf / .js)" class="input-field flex-1 min-w-[200px] px-3 py-2 border rounded-lg text-sm font-mono bg-white/5 border-white/10 focus:ring-2 focus:ring-ps5-blue outline-none">
+                <button type="button" onclick="directDownload()" class="ps5-btn-ghost px-3 py-2 text-sm shrink-0" title="Download from URL"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+                <input type="file" id="fileInput" accept=".bin,.elf,.js" class="hidden">
+                <button type="button" onclick="document.getElementById('fileInput').click()" class="ps5-btn-ghost px-4 py-2 text-sm shrink-0">Select File</button>
+                <button id="UPB" type="button" onclick="uploadPayload()" class="ps5-btn-primary px-4 py-2 text-sm shrink-0">Upload</button>
+            </div>
+        </div>
+        <div id="uploadStatus" class="text-xs h-4 mb-2 text-white/50"></div>
+        <div class="overflow-y-auto ps5-scroll max-h-[300px] min-h-[180px] -mr-1 pr-1">
+            <ul id="PL" class="space-y-2 pb-4"></ul>
+            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 text-white/40">
+                <i class="fa-regular fa-folder-open text-5xl mb-3"></i>
+                <p class="text-sm">No payloads</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="ps5-card p-4 min-h-[500px] mt-6" id="voidshell-section">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-ghost text-ps5-blue"></i>
+            <h3 class="text-sm font-semibold text-white/90">VoidShell</h3>
+            <span class="text-xs text-white/50">— Load voidshell.elf on PS5 to see library, temps &amp; PKG manager</span>
+        </div>
+        <div id="voidshell-root" class="voidshell-embed min-h-[400px] overflow-hidden rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+            <p class="text-sm text-white/50 animate-pulse">Loading VoidShell…</p>
+        </div>
+    </section>
+
+</main>
+
+<footer class="w-full border-t surface/90 backdrop-blur-md border-white/5 py-4 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] uppercase font-bold tracking-widest opacity-60">
+
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2" title="The IP address of this WebUI server">
+                <i class="fa-solid fa-server"></i>
+                <span>Server: <span id="server-ip" class="text-brand-light">Loading...</span></span>
+            </div>
+
+            <div class="flex items-center gap-2" title="Your device's IP address">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>Client: <span id="client-ip" class="text-brand-light">Loading...</span></span>
+            </div>
+
+            <div class="flex items-center gap-2" title="Local System Time">
+                <i class="fa-regular fa-clock"></i>
+                <span id="live-clock" class="text-brand-light font-mono">00:00:00</span>
+            </div>
+        </div>
+        <span><i class="fa-solid fa-code-branch mr-1"></i>Y2JB WebUI</span>
+    </div>
+</footer>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="text/babel" src="{{ url_for('static', filename='voidshell_app.js') }}"></script>
+</body>
+</html>
