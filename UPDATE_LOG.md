@@ -1,5 +1,17 @@
 # Update Log - Y2JB-WebUI BackPork Autoloader
 
+## Last Updated: February 12, 2026
+
+### Payload send & WebUI fixes (Feb 2026)
+- **backpork_manager.py**, **backpork.js**, **backpork.html** synced with WebUI that includes payload-send fixes.
+- **Host WebUI recommendations** (apply in your Y2JB-WebUI if lapse.js send was failing):
+  - Load IP/settings from **`/api/settings`** (not static JSON) so the Connection box is not cached.
+  - Add **Loader Port** setting (default 50000; some loaders use 9026) and use it for lapse.js / JS payloads.
+  - **SendPayload**: return specific errors (connection refused, timeout, host not found) and strip IP whitespace; 15s timeout.
+  - Add **`/api/check_loader`** and a **Test** button next to the IP field to verify loader reachability.
+
+---
+
 ## Last Updated: February 4, 2026
 
 ### Summary

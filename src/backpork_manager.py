@@ -32,10 +32,8 @@ MAKE_FSELF_PATH = os.path.join(PROJECT_ROOT, "make_fself", "make_fself.py")
 REQUIRED_LIBS = {
     "libSceAgc.sprx": "libSceAgc.bps",
     "libSceAgcDriver.sprx": "libSceAgcDriver.bps",
-    "libSceFiber.sprx": "libSceFiber.bps",
     "libSceNpAuth.sprx": "libSceNpAuth.bps",
     "libSceNpAuthAuthorizedAppDialog.sprx": "libSceNpAuthAuthorizedAppDialog.bps",
-    "libScePsml.sprx": "libScePsml.bps",
     "libSceSaveData.native.sprx": "libSceSaveData.native.bps"
 }
 

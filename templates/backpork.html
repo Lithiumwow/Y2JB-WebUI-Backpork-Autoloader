@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>(function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');})();</script>
     <link rel="manifest" href="{{ url_for('static', filename='json/manifest.json') }}">
     <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,14 +12,14 @@
     <title>BackPork - Y2JB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    fontFamily: { sans: ['Noto Sans', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'] },
                     colors: {
                         ps5: {
                             black: '#0a0a0f',
@@ -40,6 +41,7 @@
         }
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/light-mode.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/toast.css') }}">
     <script src="{{ url_for('static', filename='color_mode.js') }}" defer></script>
     <script src="{{ url_for('static', filename='toast.js') }}" defer></script>
@@ -77,7 +79,7 @@
                 <i class="fa-solid fa-home text-xs"></i> Home
             </a>
             <button onclick="typeof toggleTheme==='function'&&toggleTheme()" class="w-9 h-9 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 transition-all" aria-label="Toggle theme">
-                <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                <i id="theme-icon" class="theme-icon fa-solid fa-moon text-sm"></i>
             </button>
         </div>
     </div>
