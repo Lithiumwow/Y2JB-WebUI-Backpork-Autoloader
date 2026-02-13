@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VoidShell V1.00 - Pre-Beta</title>
+    
+    <!-- Using CDN for simplicity as requested, keeping offline capability logic in C just in case -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        void: { 900: '#050507', 800: '#0a0e17', 700: '#151926', card: 'rgba(20, 24, 39, 0.7)' },
+                        light: { bg: '#f3f4f6', card: 'rgba(255, 255, 255, 0.8)', text: '#111827' },
+                        neon: { purple: '#8b5cf6', blue: '#3b82f6', pink: '#ec4899', green: '#10b981', red: '#ef4444', yellow: '#f59e0b', orange: '#f97316' }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slideIn': 'slideIn 0.3s ease-out forwards',
+                        'slideUp': 'slideUp 0.3s ease-out forwards',
+                        'fadeIn': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        slideIn: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { -webkit-tap-highlight-color: transparent; transition: background-color 0.3s ease, color 0.3s ease; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        .dark ::-webkit-scrollbar-track { background: #0a0e17; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 3px; }
+        
+        .glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+        .dark .glass { background: rgba(20, 24, 39, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass { background: rgba(255, 255, 255, 0.75); border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        
+        .bg-mesh { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; transition: opacity 0.5s ease; }
+        .dark .bg-mesh { background: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #050507 50%); }
+        .bg-mesh { background: radial-gradient(circle at 50% -20%, #e0e7ff 0%, #f3f4f6 50%); }
+
+        .grid-overlay { position: fixed; inset: 0; z-index: -1; background-size: 40px 40px; mask-image: linear-gradient(to bottom, black 40%, transparent 100%); transition: opacity 0.5s ease; }
+        .dark .grid-overlay { background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); }
+        .grid-overlay { background-image: linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px); }
+    </style>
+</head>
+<body class="h-screen overflow-hidden bg-light-bg dark:bg-void-900 text-gray-900 dark:text-white selection:bg-neon-purple selection:text-white font-sans">
+    <script>
+        window.VOIDSHELL_PS5_HOST = '{{ ps5_ip|e }}';
+        window.VOIDSHELL_PS5_PORT = {{ voidshell_port|default(7007) }};
+        window.VOIDSHELL_EMBEDDED = false;
+        window.VOIDSHELL_ROOT_ID = 'root';
+        window.VOIDSHELL_USE_PROXY = true;
+        window.Y2JB_HOME_URL = '{{ y2jb_home_url | default("http://172.16.0.28:8000") | e }}';
+    </script>
+
+    <div class="bg-mesh"></div>
+    <div class="grid-overlay"></div>
+    <div id="root" class="h-full w-full"></div>
+
+    <script type="text/babel" src="{{ url_for('static', filename='voidshell_app.js') }}"></script>
+</body>
+</html>

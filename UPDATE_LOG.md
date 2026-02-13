@@ -1,5 +1,14 @@
 # Update Log - Y2JB-WebUI BackPork Autoloader
 
+## Last Updated: February 13, 2026
+
+### UI reference files (Feb 13, 2026)
+- **templates/index_example.html** – Main UI layout: Payloads in middle, Jailbreak in Connection card, VoidShell full-width (VoidShell port default 7007).
+- **static/voidshell_app_example.js** – VoidShell embed app (default port 7007, offline hint).
+- **templates/voidshell_example.html**, **templates/settings_example.html** – Reference templates (VoidShell port 7007, settings placeholder).
+
+---
+
 ## Last Updated: February 12, 2026
 
 ### Payload send & WebUI fixes (Feb 2026)
