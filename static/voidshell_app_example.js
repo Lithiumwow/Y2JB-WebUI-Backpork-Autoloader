@@ -88,6 +88,52 @@
             );
         };
 
+        const CompactStatsBar = ({ stats }) => {
+            const s = stats || {};
+            return (
+                <div className="flex items-center gap-3 border-l border-white/10 pl-3">
+                    <span title="APU Temp"><span className="text-white/50">APU</span> <span className="text-white font-semibold">{s.soc ?? 0}°</span></span>
+                    <span title="CPU Temp"><span className="text-white/50">CPU</span> <span className="text-white font-semibold">{s.cpu ?? 0}°</span></span>
+                    <span title="Uptime"><span className="text-white/50">Up</span> <span className="text-white font-semibold">{s.sys_uptime || '0:00'}</span></span>
+                    <span title="Library"><span className="text-white/50">Lib</span> <span className="text-white font-semibold">{s.total ?? 0}</span> <span className="text-white/40">(P5:{s.ps5 ?? 0} P4:{s.ps4 ?? 0})</span></span>
+                </div>
+            );
+        };
+
+        const CompactFanControl = ({ showToast }) => {
+            const [config, setConfig] = useState(null);
+            const saveRef = useRef(null);
+            useEffect(() => {
+                fetch(`${API_BASE}/api/config_raw`).then(r => r.text()).then(t => {
+                    const parsed = parseINI(t);
+                    ['Settings', 'FanControl', 'Sentinel', 'SentinelWhitelist', 'SentinelGames', 'CustomPaths', 'Blacklist'].forEach(s => { if (!parsed[s]) parsed[s] = {}; });
+                    setConfig(parsed);
+                }).catch(() => setConfig({ FanControl: {} }));
+            }, []);
+            const update = (key, value) => {
+                if (!config) return;
+                const next = { ...config, FanControl: { ...(config.FanControl || {}), [key]: value.toString() } };
+                setConfig(next);
+                if (saveRef.current) clearTimeout(saveRef.current);
+                saveRef.current = setTimeout(() => {
+                    fetch(`${API_BASE}/api/save_ini`, { method: 'POST', body: stringifyINI(next) }).then(() => { if (showToast) showToast('Fan saved'); }).catch(() => {});
+                }, 400);
+            };
+            if (!config) return <div className="flex items-center gap-2 text-white/40 text-[10px]">Fan…</div>;
+            const enabled = config.FanControl?.Enabled === 'true';
+            const target = config.FanControl?.TargetTemp || 60;
+            return (
+                <div className="flex items-center gap-2 border-l border-white/10 pl-3 text-[10px] font-mono text-white/70">
+                    <span className="text-white/50">Fan</span>
+                    <button type="button" onClick={() => { haptic(); update('Enabled', !enabled); }} className={`w-8 h-4 rounded-full transition-colors ${enabled ? 'bg-neon-green' : 'bg-white/20'}`} title="Enable Override">
+                        <span className={`block w-3.5 h-3.5 rounded-full bg-white shadow transition-transform mt-0.5 ${enabled ? 'translate-x-4 ml-0.5' : 'translate-x-0.5'}`} />
+                    </button>
+                    <span className="text-white font-semibold">{target}°</span>
+                    <input type="range" min="40" max="80" step="1" value={target} onChange={(e) => update('TargetTemp', e.target.value)} className="w-14 h-1 accent-neon-blue bg-white/20 rounded cursor-pointer" title="Target Temp" />
+                </div>
+            );
+        };
+
         const Carousel = ({ games, onLaunch, isGameRunning }) => {
             const [index, setIndex] = useState(0);
             const [touchStart, setTouchStart] = useState(null);
@@ -775,6 +821,7 @@
             const [y2jbIp, setY2jbIp] = useState('');
             const [y2jbAjb, setY2jbAjb] = useState(false);
             const [y2jbFtpPort, setY2jbFtpPort] = useState('1337');
+            const [pkgPopoverOpen, setPkgPopoverOpen] = useState(false);
             const failCountRef = useRef(0);
             const CONSECUTIVE_FAILS_BEFORE_OFFLINE = 2;
 
@@ -796,6 +843,16 @@
             useEffect(() => {
                 if (!VOIDSHELL_MAIN_UI) return;
                 fetch('/api/settings').then(r => r.json()).then(c => { setY2jbIp(c.ip || ''); setY2jbAjb(c.ajb === true || c.ajb === 'true'); setY2jbFtpPort(c.ftp_port || '1337'); }).catch(() => {});
+            }, []);
+            useEffect(() => {
+                if (!VOIDSHELL_EMBEDDED) return;
+                const contentEl = document.getElementById('pkg-popover-content');
+                if (contentEl && contentEl.getAttribute('data-open') === 'true') setPkgPopoverOpen(true);
+                const onOpen = () => setPkgPopoverOpen(true);
+                const onClose = () => setPkgPopoverOpen(false);
+                document.addEventListener('pkg-popover-open', onOpen);
+                document.addEventListener('pkg-popover-close', onClose);
+                return () => { document.removeEventListener('pkg-popover-open', onOpen); document.removeEventListener('pkg-popover-close', onClose); };
             }, []);
             
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
@@ -873,19 +930,20 @@
             const setY2jbAjbAndSave = (v) => { setY2jbAjb(v); fetch('/edit_ajb', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: String(v) }) }); };
             const y2jb = VOIDSHELL_MAIN_UI ? { ip: y2jbIp, setIp: setY2jbIp, saveIp: saveY2jbIp, ajb: y2jbAjb, setAjb: setY2jbAjbAndSave, ftp_port: y2jbFtpPort, setFtpPort: setY2jbFtpPort, saveFtpPort: saveY2jbFtpPort, testLoader: testY2jbLoader, jailbreak: doJailbreak, installDownload0: doInstallDownload0, blockUpdates: doBlockUpdates } : null;
 
-            const tabs = [ { id: 'dashboard', icon: 'layout-dashboard', label: 'Home' }, { id: 'pkg', icon: 'package', label: 'PKG' }, { id: 'settings', icon: 'settings', label: 'Settings' }, { id: 'logs', icon: 'terminal', label: 'Logs' } ];
+            const tabsBase = [ { id: 'dashboard', icon: 'layout-dashboard', label: 'Home' }, { id: 'pkg', icon: 'package', label: 'PKG' }, { id: 'settings', icon: 'settings', label: 'Settings' }, { id: 'logs', icon: 'terminal', label: 'Logs' } ];
+            const tabs = VOIDSHELL_EMBEDDED ? tabsBase.filter(t => t.id !== 'pkg') : tabsBase;
             const mainContent = (
                 <>
                     {VOIDSHELL_MAIN_UI && y2jb && <Y2JBTopStrip y2jb={y2jb} showToast={showToast} setTab={setTab} />}
                     <div className="flex justify-between items-center mb-4 flex-wrap gap-2"><ConnectionBadge online={online} showTarget={true} /><span className="text-xs text-gray-500 dark:text-gray-400">voidshell.elf on PS5</span></div>
-                    {tab === 'dashboard' && (
+                    {(tab === 'dashboard' || (VOIDSHELL_EMBEDDED && tab === 'pkg')) && (
                         <div className="w-full space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             {!VOIDSHELL_EMBEDDED && <><Hero activeGame={stats.active_game} library={library} onLaunch={launch} /><Carousel games={library} onLaunch={launch} isGameRunning={isGameRunning} /><div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full"><TempWidget label="APU Temp" temp={stats.soc} icon="thermometer" isManual={stats.fan_active} /><TempWidget label="CPU Temp" temp={stats.cpu} icon="cpu" isManual={stats.fan_active} /><UptimeWidget uptime={stats.sys_uptime} /><LibraryWidget total={stats.total} ps5={stats.ps5} ps4={stats.ps4} /></div></>}
                             {VOIDSHELL_EMBEDDED && <><Hero activeGame={stats.active_game} library={library} onLaunch={launch} /><Carousel games={library} onLaunch={launch} isGameRunning={isGameRunning} /></>}
                             <LibraryGrid games={library} onLaunch={launch} showToast={showToast} />
                         </div>
                     )}
-                    {tab === 'pkg' && <PKGManager showToast={showToast} uploading={uploading} uploadStats={uploadStats} processUpload={processUpload} />}
+                    {!VOIDSHELL_EMBEDDED && tab === 'pkg' && <PKGManager showToast={showToast} uploading={uploading} uploadStats={uploadStats} processUpload={processUpload} />}
                     {tab === 'payloads' && VOIDSHELL_MAIN_UI && <Y2JBPayloadsPanel showToast={showToast} ps5Ip={y2jbIp} />}
                     {tab === 'settings' && <Settings showToast={showToast} library={library} />}
                     {tab === 'logs' && <Terminal showToast={showToast} />}
@@ -893,23 +951,25 @@
             );
 
             if (VOIDSHELL_EMBEDDED) {
+                const miniEl = typeof document !== 'undefined' && document.getElementById('voidshell-mini-widgets');
+                const fanEl = typeof document !== 'undefined' && document.getElementById('voidshell-fan-widgets');
+                const pkgPopoverEl = typeof document !== 'undefined' && document.getElementById('pkg-popover-content');
                 return (
-                    <div className="flex flex-col min-h-[380px]">
-                        {toast && ( <div className="absolute top-2 right-2 z-[200] animate-[slideIn_0.3s_ease-out]"><div className="glass px-4 py-2 rounded-xl border-l-4 border-neon-purple shadow-xl flex items-center gap-2 text-sm"><i data-lucide="info" className="w-4 h-4 text-neon-purple"></i><span className="font-bold text-gray-900 dark:text-white">{toast}</span></div></div> )}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 border-b border-black/5 dark:border-white/10">
-                            <TempWidget label="APU Temp" temp={stats.soc} icon="thermometer" isManual={stats.fan_active} />
-                            <TempWidget label="CPU Temp" temp={stats.cpu} icon="cpu" isManual={stats.fan_active} />
-                            <UptimeWidget uptime={stats.sys_uptime} />
-                            <LibraryWidget total={stats.total} ps5={stats.ps5} ps4={stats.ps4} />
-                        </div>
-                        <div className="flex gap-2 p-2 border-b border-black/5 dark:border-white/10 flex-wrap sticky top-0 bg-white/80 dark:bg-void-800/90 backdrop-blur z-10">
+                    <>
+                        {miniEl && ReactDOM.createPortal(<CompactStatsBar stats={stats} />, miniEl)}
+                        {fanEl && ReactDOM.createPortal(<CompactFanControl showToast={showToast} />, fanEl)}
+                        {pkgPopoverEl && ReactDOM.createPortal(pkgPopoverOpen ? <div className="voidshell-pkg-popover text-sm"><PKGManager showToast={showToast} uploading={uploading} uploadStats={uploadStats} processUpload={processUpload} /></div> : null, pkgPopoverEl)}
+                        <div className="flex flex-col min-h-0">
+                            {toast && ( <div className="absolute top-2 right-2 z-[200] animate-[slideIn_0.3s_ease-out]"><div className="glass px-4 py-2 rounded-xl border-l-4 border-neon-purple shadow-xl flex items-center gap-2 text-sm"><i data-lucide="info" className="w-4 h-4 text-neon-purple"></i><span className="font-bold text-gray-900 dark:text-white">{toast}</span></div></div> )}
+                            <div className="flex gap-2 p-2 border-b border-black/5 dark:border-white/10 flex-wrap sticky top-0 bg-white/80 dark:bg-void-800/90 backdrop-blur z-10">
                             {tabs.map(t => ( <button key={t.id} onClick={() => { haptic(); setTab(t.id); }} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${tab === t.id ? 'bg-neon-purple text-white' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'}`}><i data-lucide={t.icon} className="w-3.5 h-3.5 inline mr-1"></i>{t.label}</button> ))}
                             <button onClick={() => handleAction('rescan')} className="ml-auto px-2 py-1 text-gray-400 hover:text-neon-blue" title="Rescan"><i data-lucide="refresh-cw" className="w-4 h-4"></i></button>
                         </div>
                         <main className="flex-1 overflow-y-auto p-4 min-h-[320px]">
                             {mainContent}
                         </main>
-                    </div>
+                        </div>
+                    </>
                 );
             }
 

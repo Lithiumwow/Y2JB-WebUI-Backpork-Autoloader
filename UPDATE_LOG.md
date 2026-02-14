@@ -2,10 +2,16 @@
 
 ## Last Updated: February 13, 2026
 
+### Sync with Y2JB-WebUI (Feb 13, 2026)
+- **Core BackPork:** `src/backpork_manager.py`, `static/backpork.js`, `templates/backpork.html` synced from current Y2JB-WebUI.
+- **server_backpork_routes.py:** Added `/api/backpork/test_code` and `/api/backpork/discover_paths`; added create_fakelib logging and dependency note (logger, sys).
+- **UI reference files:** `index_example.html`, `voidshell_example.html`, `settings_example.html`, `voidshell_app_example.js` refreshed from Y2JB-WebUI. Added **templates/main_ui_example.html** (nav stats/fan/PKG bubble, VoidShell link).
+
 ### UI reference files (Feb 13, 2026)
 - **templates/index_example.html** – Main UI layout: Payloads in middle, Jailbreak in Connection card, VoidShell full-width (VoidShell port default 7007).
 - **static/voidshell_app_example.js** – VoidShell embed app (default port 7007, offline hint).
 - **templates/voidshell_example.html**, **templates/settings_example.html** – Reference templates (VoidShell port 7007, settings placeholder).
+- **templates/main_ui_example.html** – Nav bar / main UI chunk (stats, fan, PKG bubble) for integrators.
 
 ---
 

@@ -96,21 +96,29 @@
 </head>
 
 <body class="font-sans antialiased min-h-screen flex flex-col transition-colors duration-300 ps5-bg ps5-body text-white">
+    <div id="voidshell-config" data-host="{{ ps5_ip|e }}" data-port="{{ voidshell_port|default(7007) }}" hidden aria-hidden="true"></div>
     <script>
-        window.VOIDSHELL_PS5_HOST = '{{ ps5_ip|e }}';
-        window.VOIDSHELL_PS5_PORT = {{ voidshell_port|default(7007) }};
-        window.VOIDSHELL_EMBEDDED = true;
-        window.VOIDSHELL_ROOT_ID = 'voidshell-root';
-        window.VOIDSHELL_USE_PROXY = true;
+        (function () {
+            var el = document.getElementById('voidshell-config');
+            window.VOIDSHELL_PS5_HOST = el.getAttribute('data-host') || '';
+            window.VOIDSHELL_PS5_PORT = parseInt(el.getAttribute('data-port'), 10) || 7007;
+            window.VOIDSHELL_EMBEDDED = true;
+            window.VOIDSHELL_ROOT_ID = 'voidshell-root';
+            window.VOIDSHELL_USE_PROXY = true;
+        })();
     </script>
 
 <nav class="relative w-full border-b border-white/5">
     <div class="mx-auto px-4 sm:px-4 lg:px-8">
         <div class="relative flex h-16 items-center justify-between">
-            <a href="/" class="flex items-center gap-2">
-                <i class="fa-brands fa-playstation text-3xl"></i>
-                <span class="font-bold text-xl tracking-tight">Y2JB</span>
-            </a>
+            <div class="flex items-center gap-4 min-w-0">
+                <a href="/" class="flex items-center gap-2 shrink-0">
+                    <i class="fa-brands fa-playstation text-3xl"></i>
+                    <span class="font-bold text-xl tracking-tight">Y2JB</span>
+                </a>
+                <div id="voidshell-mini-widgets" class="hidden lg:flex items-center gap-2 text-[10px] font-mono text-white/70 shrink-0 max-w-[420px] overflow-hidden"></div>
+                <div id="voidshell-fan-widgets" class="hidden lg:flex items-center shrink-0"></div>
+            </div>
             <div class="absolute inset-y-0 right-0 flex items-center gap-2 lg:hidden">
                 <button onclick="toggleTheme()"
                         class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95">
@@ -122,6 +130,13 @@
                 </button>
             </div>
             <div class="items-center gap-2 hidden lg:flex">
+                <div class="relative" id="pkg-nav-wrap">
+                    <button type="button" onclick="togglePkgPopover()" id="pkg-nav-btn"
+                            class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>PKG Manager</span>
+                    </button>
+                </div>
                 <a href="{{ url_for('repo_manager_ui') }}"
                    class="text-xs input-field px-3 py-1.5 rounded-lg border flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
                     <i class="fa-solid fa-gear"></i>
@@ -179,9 +194,20 @@
             </div>
         </div>
     </div>
+    <div id="pkg-popover" class="hidden fixed right-4 top-20 z-[100] w-[min(90vw,420px)] max-h-[85vh] overflow-hidden rounded-xl border border-white/10 bg-ps5-card shadow-xl">
+        <div class="flex items-center justify-between px-3 py-2 border-b border-white/10">
+            <span class="text-xs font-bold uppercase text-white/80">PKG Manager</span>
+            <button type="button" onclick="closePkgPopover()" class="p-1.5 rounded-lg hover:bg-white/10 text-white/70" aria-label="Close"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div id="pkg-popover-content" class="overflow-y-auto max-h-[calc(85vh-44px)] p-3" data-open="false"></div>
+    </div>
 
     <div id="mobile-menu" class="hidden" data-hidden="true">
         <div class="space-y-1 px-2 pt-2 pb-3">
+            <button type="button" onclick="togglePkgPopover(); toggleMenu();" class="w-full text-left text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                <i class="fa-solid fa-box-open"></i>
+                <span>PKG Manager</span>
+            </button>
             <a href="{{ url_for('repo_manager_ui') }}"
                class="text-sm input-field px-3 py-1.5 rounded-lg flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
                 <i class="fa-solid fa-gear"></i>
@@ -311,16 +337,7 @@
         </div>
     </section>
 
-    <section class="ps5-card p-4 min-h-[500px] mt-6" id="voidshell-section">
-        <div class="flex items-center gap-2 mb-4">
-            <i class="fa-solid fa-ghost text-ps5-blue"></i>
-            <h3 class="text-sm font-semibold text-white/90">VoidShell</h3>
-            <span class="text-xs text-white/50">— Load voidshell.elf on PS5 to see library, temps &amp; PKG manager</span>
-        </div>
-        <div id="voidshell-root" class="voidshell-embed min-h-[400px] overflow-hidden rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-            <p class="text-sm text-white/50 animate-pulse">Loading VoidShell…</p>
-        </div>
-    </section>
+    <div id="voidshell-root" class="sr-only" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"></div>
 
 </main>
 
@@ -347,6 +364,33 @@
     </div>
 </footer>
 
+    <script>
+        function togglePkgPopover() {
+            var pop = document.getElementById('pkg-popover');
+            var content = document.getElementById('pkg-popover-content');
+            if (pop.classList.contains('hidden')) {
+                pop.classList.remove('hidden');
+                if (content) content.setAttribute('data-open', 'true');
+                setTimeout(function() {
+                    document.dispatchEvent(new CustomEvent('pkg-popover-open'));
+                    document.addEventListener('click', pkgPopoverClickOutside);
+                }, 0);
+            } else { closePkgPopover(); }
+        }
+        function closePkgPopover() {
+            var pop = document.getElementById('pkg-popover');
+            var content = document.getElementById('pkg-popover-content');
+            pop.classList.add('hidden');
+            if (content) content.setAttribute('data-open', 'false');
+            document.dispatchEvent(new CustomEvent('pkg-popover-close'));
+            document.removeEventListener('click', pkgPopoverClickOutside);
+        }
+        function pkgPopoverClickOutside(e) {
+            var wrap = document.getElementById('pkg-nav-wrap');
+            var pop = document.getElementById('pkg-popover');
+            if ((!wrap || !wrap.contains(e.target)) && (!pop || !pop.contains(e.target))) closePkgPopover();
+        }
+    </script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
